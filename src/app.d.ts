@@ -8,6 +8,21 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	export type Direction = 'N' | 'S' | 'E' | 'O';
+
+	export interface Position {
+		x: number;
+		y: number;
+	}
+
+	export interface WorldCell {
+		x: number;
+		y: number;
+		hasRover: boolean;
+		hasObstacle: boolean;
+	}
+
+	export type Grid = WorldCell[][];
 }
 
 export {};
