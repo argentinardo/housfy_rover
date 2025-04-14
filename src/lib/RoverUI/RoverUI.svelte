@@ -4,6 +4,8 @@
     import { onMount } from 'svelte';
 
 	const PLANET_SIZE = 20;
+	const MIN_OBSTACLES = 10;
+	const MAX_OBSTACLES = 20;
 	
 	let grid: Grid = [];
 	let direction: Direction = '';
@@ -12,6 +14,7 @@
 	let rover: Rover;
 	let result = '';
 	let isRoverInDanger = false;
+	let obstacles: Position[] = [];
 
 	class Rover {
 		x: number;
@@ -92,6 +95,13 @@
 				};
 			}
 
+			if (obstacles.some(obs => obs.x === newX && obs.y === newY)) {
+				return {
+					success: false,
+					message: `Has encontrado un obstáculo en (${newX}, ${newY}), se suspende la ejecución de comandos`
+				};
+			}
+
 			this.x = newX;
 			this.y = newY;
 			return {
@@ -133,11 +143,11 @@
 						};
 				}
 
-				executedCommands++;
 
 				if (!result.success) {
 					return {
 						...result,
+                        
 					};
 				}
 			}
@@ -149,27 +159,50 @@
 		}
 	}
 
+	function generateObstacles(roverX: number, roverY: number): Position[] {
+		const obstacleCount = Math.floor(Math.random() * (MAX_OBSTACLES - MIN_OBSTACLES + 1)) + MIN_OBSTACLES;
+		const obstaclePositions: Position[] = [];
+		
+		while (obstaclePositions.length < obstacleCount) {
+			const x = Math.floor(Math.random() * PLANET_SIZE);
+			const y = Math.floor(Math.random() * PLANET_SIZE);
+			
+			if (x === roverX && y === roverY) {
+				continue;
+			}
+			
+			if (!obstaclePositions.some(pos => pos.x === x && pos.y === y)) {
+				obstaclePositions.push({ x, y });
+			}
+		}
+		
+		return obstaclePositions;
+	}
+
 	function initializeGrid() {
-		const size: number = 20;
+		const size: number = PLANET_SIZE;
 		const randomCoord: () => number = () => Math.floor(Math.random() * size);
 		const roverX: number = randomCoord();
 		const roverY: number = randomCoord();
+		
+		obstacles = generateObstacles(roverX, roverY);
 
 		grid = Array(size)
 			.fill(null)
 			.map((_, y) =>
-				// Para cada fila, creamos una matriz de objetos
 				Array(size)
 					.fill(null)
 					.map((_, x) => {
+						const hasObstacle = obstacles.some(obs => obs.x === x && obs.y === y);
+						
 						return {
 							x,
 							y,
-							hasRover: x === roverX && y === roverY
+							hasRover: x === roverX && y === roverY,
+							hasObstacle
 						};
 					})
 			);
-		console.log(roverX, roverY);
 	}
 
 	function updateGrid() {
@@ -177,12 +210,15 @@
 		grid = [];
 
 		for (let y = 0; y < PLANET_SIZE; y++) {
-			const row: GridCellType[] = [];
+			const row = [];
 			for (let x = 0; x < PLANET_SIZE; x++) {
+				const hasObstacle = obstacles.some(obs => obs.x === x && obs.y === y);
+				
 				row.push({
-					x: x,
-					y: y,
-					hasRover: x === roverPos.x && y === roverPos.y
+					x,
+					y,
+					hasRover: x === roverPos.x && y === roverPos.y,
+					hasObstacle
 				});
 			}
 			grid.push(row);
