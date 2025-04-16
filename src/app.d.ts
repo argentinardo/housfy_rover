@@ -15,6 +15,19 @@ declare global {
 		y: number;
 	}
 
+	export interface RoverPosition {
+		x: number;
+		y: number;
+		direction: Direction;
+	  }
+
+	  export interface MoveResult {
+		success: boolean;
+		message?: string;
+		obstaclePosition?: Obstacle;
+	  }
+
+
 	export interface WorldCell {
 		x: number;
 		y: number;

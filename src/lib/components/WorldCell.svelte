@@ -16,7 +16,7 @@
 		: '';
 </script>
 
-<div class="cell pointer-events-none caret-transparent select-none focus:outline-none">
+<div class="cell pointer-events-none caret-transparent select-none focus:outline-none bg-white">
 	{#if hasObstacle}
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
 			viewBox="0 0 24 24"
 			stroke-width="1.5"
 			stroke="currentColor"
-			class="obstacle"
+			class="w-6 h-6 text-yellow-600"
 		>
 			<path
 				stroke-linecap="round"
@@ -34,22 +34,25 @@
 		</svg>
 	{/if}
 
+
+
 	{#if hasRover}
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="1.5"
-			stroke="currentColor"
-			class={roverIconClass}
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-			/>
-		</svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class={roverIconClass}
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
 	{/if}
+
 </div>
 
 <style>
@@ -58,42 +61,17 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		position: relative;
-		background-color: #ebf8ff;
-		font-size: 1.5rem;
-	}
-
-	.obstacle {
-		width: 90%;
-		height: auto;
-		color: #dc3545;
 	}
 
 	.rover-icon {
-		width: 90%;
-		height: auto;
+		width: 1.5rem;
+		height: 1.5rem;
 		color: #11aefa;
 	}
 
 	.rover-icon--danger {
-		animation: fondoAnimado 1.4s infinite; /* Añadido para activar la animación */
+		animation: fondoAnimado 1.4s infinite;
 	}
-
-	@keyframes fondoAnimado {
-		0% {
-			background: radial-gradient(circle, yellow,yellow, transparent, transparent)
-		}
-		50% {
-			background: radial-gradient(circle, yellow,yellow, transparent, transparent)
-		}
-    100% {
-			background: radial-gradient (circle, transparent,transparent, transparent, transparent)
-		}
-	}
-
-
-
-
 
 	.direction-n {
 		transform: rotate(0deg);
@@ -105,6 +83,23 @@
 		transform: rotate(180deg);
 	}
 	.direction-w {
+		transform: rotate(270deg);
+	}
+
+	@keyframes fondoAnimado {
+		0% {
+			background: radial-gradient(circle, yellow,yellow, transparent, transparent)
+		}
+		50% {
+			background: radial-gradient(circle, yellow,yellow, transparent, transparent)
+		}
+		100% {
+			background: radial-gradient (circle, transparent,transparent, transparent, transparent)
+		}
+	}
+
+	/* Para rotate-270 que no existe en Tailwind */
+	.rotate-270 {
 		transform: rotate(270deg);
 	}
 </style>

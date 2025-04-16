@@ -8,10 +8,10 @@
 
 </script>
 
-<div class="panel w-full">
-	<h2 class="panel-title">Mapa marciano</h2>
+<div class="w-full bg-white rounded-lg p-4 shadow-sm">
+	<h2 class="text-xl font-semibold mb-3 flex items-center">Mapa marciano</h2>
 	<div
-		class="grid-container overflow-hidden rounded-md"
+		class="grid gap-px overflow-hidden rounded-md border border-[#11aefa] bg-[#11aefa]"
 		style="grid-template-columns: repeat({gridSize}, minmax(0, 1fr));"
 	>
 		{#each grid as row}

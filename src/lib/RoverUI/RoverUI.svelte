@@ -1,7 +1,8 @@
 <script lang="ts">
 	import WorldGrid from '../components/WorldGrid.svelte';
+	import Info from '../components/Info.svelte';
 	import CommandInput from '../components/CommandInput.svelte';
-    import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	const PLANET_SIZE = 20;
 	const MIN_OBSTACLES = 10;
@@ -15,6 +16,22 @@
 	let result = '';
 	let isRoverInDanger = false;
 	let obstacles: Position[] = [];
+	let messages: {text: string, type: string}[] = [];
+
+	function addMessage(text: string, type: string = 'info') {
+		messages = [{ text, type }, ...messages.slice(0, 4)];
+	}
+
+	// Función para convertir dirección de letra a nombre en castellano
+	function direccionEnCastellano(dir: Direction): string {
+		switch (dir) {
+			case 'N': return 'Norte';
+			case 'S': return 'Sur';
+			case 'E': return 'Este';
+			case 'O': return 'Oeste';
+			default: return dir;
+		}
+	}
 
 	class Rover {
 		x: number;
@@ -91,14 +108,14 @@
 			if (newX < 0 || newX >= PLANET_SIZE || newY < 0 || newY >= PLANET_SIZE) {
 				return {
 					success: false,
-					message: `Has alcanzado el límite de la grilla, se suspende la ejecución de comandos`
+					message: `Límite del terreno, se suspende la ejecución de comandos`
 				};
 			}
 
 			if (obstacles.some(obs => obs.x === newX && obs.y === newY)) {
 				return {
 					success: false,
-					message: `Has encontrado un obstáculo en (${newX}, ${newY}), se suspende la ejecución de comandos`
+					message: `Obstáculo encontrado, se suspende la ejecución de comandos`
 				};
 			}
 
@@ -106,7 +123,7 @@
 			this.y = newY;
 			return {
 				success: true,
-				message: `Rover se movió a la posición (${this.x}, ${this.y})`
+				message: `Comandos ejecutados correctamente`
 			};
 		}
 
@@ -126,14 +143,14 @@
 						this.turnLeft();
 						result = {
 							success: true,
-							message: `Rover giró a la izquierda, ahora mira hacia ${this.direction}`
+							message: `Rover giró a la izquierda, ahora mira hacia ${direccionEnCastellano(this.direction)}`
 						};
 						break;
 					case 'R':
 						this.turnRight();
 						result = {
 							success: true,
-							message: `Rover giró a la derecha, ahora mira hacia ${this.direction}`
+							message: `Rover giró a la derecha, ahora mira hacia ${direccionEnCastellano(this.direction)}`
 						};
 						break;
 					default:
@@ -243,11 +260,11 @@
 		rover = new Rover(x, y, direction);
 
 		updateGrid();
-		console.log(`Rover inicializado en posición (${x}, ${y}), dirección ${direction}`);
+		addMessage(`El rover se encuentra en las coordenadas: x${x}, y${y}, dirección ${direccionEnCastellano(direction)}`, 'info');
 	}
 
     function autofocusInput(): void {
-        const input: HTMLInputElement | null = document.querySelector('.input-command');
+        const input: HTMLInputElement | null = document.querySelector('#input-command');
         if (input) {
             input.focus();
         }
@@ -262,7 +279,7 @@
 	let commands = '';
 	function executeCommands() {
 		if (!commands) {
-			console.log('No hay comandos para ejecutar');
+			addMessage('No hay comandos para ejecutar', 'error');
 			return;
 		}
 
@@ -274,9 +291,9 @@
 		updateGrid();
 
 		if (moveResult.success) {
-			console.log(result);
+			addMessage(result, 'success');
 		} else {
-			console.log(result);
+			addMessage(result, 'error');
 		}
 
 		commands = '';
@@ -287,22 +304,43 @@
 	}
 	function handleExecuteCommandsClick() {
 		if (!commands) {
-			console.log('No hay comandos para ejecutar');
+			addMessage('No hay comandos para ejecutar', 'error');
 		} else {
 			executeCommands();
 		}
 	}
 </script>
 
-<div class="rover-ui">
-	<WorldGrid {grid} {direction} gridSize={PLANET_SIZE} isInDanger={isRoverInDanger} />
-	<CommandInput bind:commands onExecuteCommands={handleExecuteCommandsClick} />
+<div class="p-5 max-w-7xl mx-auto">
+    <h1 class="text-xxl font-semibold mb-3 s-cSJp0KO92mMg text-3xl text-white">Misión Rover - Damián Nardini</h1>
+  
+  <!-- Layout de escritorio (>1200px): mapa a la izquierda, comandos/info a la derecha -->
+  <div class="flex flex-col xl:flex-row gap-5">
+    <!-- Primera columna (mapa) - Ahora usa 2/3 en lugar de 3/4 -->
+    <div class="w-full xl:w-2/3">
+      <!-- Contenedor para mantener el aspecto 1:1 del mapa -->
+      <div class="aspect-square w-full">
+        <WorldGrid {grid} {direction} gridSize={PLANET_SIZE} isInDanger={isRoverInDanger} />
+      </div>
+    </div>
+    
+    <!-- Segunda columna (comandos + info) - Ahora usa 1/3 en lugar de 1/4 -->
+    <div class="w-full xl:w-1/3">
+      <!-- En pantallas pequeñas, CommandInput e Info van lado a lado -->
+      <div class="flex flex-col md:flex-row xl:flex-col gap-4">
+        <!-- CommandInput ocupa todo el ancho en XL, la mitad en md y todo en móvil -->
+        <div class="w-full md:w-1/2 xl:w-full">
+          <CommandInput bind:commands onExecuteCommands={handleExecuteCommandsClick} />
+        </div>
+        
+        <!-- Info ocupa todo el ancho en XL, la mitad en md y todo en móvil -->
+        <div class="w-full md:w-1/2 xl:w-full">
+          <Info {messages} />
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-	.rover-ui {
-		padding: 20px;
-		max-width: 800px;
-		margin: 0 auto;
-	}
 </style>
